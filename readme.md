@@ -1,0 +1,1 @@
+web wallet to view and acess stellar account

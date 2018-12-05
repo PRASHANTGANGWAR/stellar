@@ -3,8 +3,9 @@ var app = express();
 var router = express.Router();
 var bodyParser = require('body-parser');//pull post content from http request
 var urlencodedParser = bodyParser.urlencoded({ extended: true });
-app.use(bodyParser());
+//app.use(bodyParser());
 app.use(bodyParser.json());
+
 app.set('view engine', 'ejs');
 app.use(express.static('./views'));
 //
@@ -69,5 +70,7 @@ app.get('/', function (req, res) {
 
 
 
-
-const login = require('./routes/login');
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+  extended: true
+}));

@@ -29,7 +29,6 @@ app.listen(4200, () => {
     console.log("connected port 4200 wallet api");
 })
 
-const authorizationFlag = require('./api/routes/authorizationFlag.js');
 const balanceOf= require('./api/routes/balanceOf.js');
 const burn= require('./api/routes/burn.js');
 const changeTrust= require('./api/routes/changeTrust.js');
@@ -44,9 +43,13 @@ const setHomeDomain= require('./api/routes/setHomeDomain.js');
 const streampayments= require('./api/routes/streampayments.js');
 const transferOktoken= require('./api/routes/transferOktoken.js');
 const transferXlm= require('./api/routes/transferXlm.js');
+const autorizeAccountAfterPuttingFlagOnIssuer= require('./api/routes/autorizeAccountAfterPuttingFlagOnIssuer.js');
+const revokeAuthorizationFlagRevokeAcessToUser= require('./api/routes/revokeAuthorizationFlagRevokeAcessToUser.js');
 
 
-app.use('/authorizationFlag', authorizationFlag);
+
+
+app.use('/revokeAuthorizationFlagRevokeAcessToUser', revokeAuthorizationFlagRevokeAcessToUser);
 app.use('/balanceOf', balanceOf)
 app.use('/burn', burn);
 app.use('/changeTrust', changeTrust)
@@ -61,7 +64,7 @@ app.use('/setHomeDomain', setHomeDomain)
 app.use('/streampayments', streampayments)
 app.use('/setHomeDomain', transferOktoken)
 app.use('/streampayments', transferXlm)
-
+app.use('/autorizeAccountAfterPuttingFlagOnIssuer', autorizeAccountAfterPuttingFlagOnIssuer)
 
 app.get('/', function (req, res) {
 

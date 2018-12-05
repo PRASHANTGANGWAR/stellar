@@ -521,6 +521,47 @@ router.get('/test', async function (req, res) {
 });
 
 
+
+
+app.get('/authacc', function (req, res) {// change trustline and make tx
+    try{
+
+    // var receivingKeys = StellarSdk.Keypair
+    //     .fromSecret(account3.secret);
+    console.log('0')
+
+        var authaccount = account3.publicKey;
+     // var receivingKeys = req.body.userSecretKey;
+    server.loadAccount(issuingKeys.publicKey())
+        .then(function (receiver) {
+            console.log('1')
+            var transaction = new StellarSdk.TransactionBuilder(receiver)
+                // The `changeTrust` operation creates (or alters) a trustline
+                // The `limit` parameter below is optional
+                .addOperation(StellarSdk.Operation.allowTrust({
+                    assetCode: "okToken",
+                    trustor: authaccount,
+                    authorize:true
+                }))
+                .build();
+            transaction.sign(issuingKeys);
+            server.submitTransaction(transaction);
+            console.log('authacc');
+        })
+        
+        .catch(function (error) {
+            console.error('Error!', error);
+        });
+    }
+    catch (e) {
+        console.log("error occured")
+    }
+});
+
+
+
+
+
 module.exports = router;
 
 

@@ -1,0 +1,20 @@
+port = 8000
+
+[database]
+type = "mysql"
+dsn = "dbuser:dbpassword@/dbname"
+
+[queries]
+federation = "SELECT account_id as id FROM Users WHERE username = ? AND domain = ?"
+reverse-federation = "SELECT username as name, domain FROM Users WHERE account_id = ?"
+
+
+port = 8000
+
+[database]
+type = "mysql"
+dsn = "dbuser:dbpassword@/dbname"
+
+[queries]
+federation = "SELECT username as memo, 'text' as memo_type, 'GD6WU64OEP5C4LRBH6NK3MHYIA2ADN6K6II6EXPNVUR3ERBXT4AN4ACD' as id FROM Users WHERE username = ? AND domain = ?"
+# No entry for `reverse-federation` since a reverse-lookup isn't possible

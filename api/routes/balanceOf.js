@@ -23,6 +23,19 @@ var server = new StellarSdk.Server(urlString, { allowHttp: true });
 
 
 
+app.get('/balanceOf', function (req, res) {
+    var pub = 'GARKTRTXR5P3KT4WW7WHTLU2CNX4JC3RGS5TJGRYSKE4Q3VSX636PS5T';
+    // var key = req.body.key;
+    var receivingKeys = StellarSdk.Keypair
+        .fromSecret('SDSAVCRE5JRAI7UFAVLE5IMIZRD6N6WOJUWKY4GFN34LOBEEUS4W2T2D').publicKey();
+    // var key = 'GBMRUSV4643UMITVDHADGLZZ5OERT7SKMTI7ZZBVYY3AKPHT2KPNBPBU';
+    server.loadAccount(pub).then(function (account) {
+        account.balances.forEach(function (balance) {//for each currency balance
+            console.log('Type:', balance.asset_code, ', Balance:', balance.balance);
+            //to get the currrency with its code balance.asset_code
+        });
+    });
+});
 
 
 

@@ -25,5 +25,30 @@ var server = new StellarSdk.Server(urlString, { allowHttp: true });
 
 
 
+app.get('/transferCoins', async function (req, res) {
+
+    
+    //source pub key GDTT75T6PWLP3RHDSVC5JUXGYIOZST4VUXHRGZBGQTR5PYA25R4AKEUT
+    var sourceSecretKey = 'SDNIGKR3TSZFGSQNN5GGNQ7E5F7NHWGAI54SMFQSUVW3UFCR2Z7KUR77';// seed of acc from which tx process
+    var sourceKeypair = StellarSdk.Keypair.fromSecret(sourceSecretKey);
+    var sourcePublicKey = sourceKeypair.publicKey();//pub key of source acc
+    var receiverPublicKey = account2.publicKey;// public key of reciever acc
+    receiverPublicKey = 'GDENPKUMUNAYWCRT7E6NFN5HBMNPIUISY7EJG4TVR3RHMS7FPQ2QJLZL';
+    StellarSdk.Network.useTestNetwork();
+    const account = await server.loadAccount(sourcePublicKey)
+    var transaction = new StellarSdk.TransactionBuilder(account)
+        .addOperation(StellarSdk.Operation.payment({
+            destination: receiverPublicKey,
+            asset: StellarSdk.Asset.native(),//native asset lumen
+            amount: '0.1',
+        }))
+        .addMemo(StellarSdk.Memo.text('coins sent oktoken'))//optional 
+        .build();
+    transaction.sign(sourceKeypair);
+    const temp = await server.submitTransaction(transaction)
+    console.log('submitted', temp._links);
+    
+});
+
 
 module.exports = router;

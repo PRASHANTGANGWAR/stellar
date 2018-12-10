@@ -20,6 +20,10 @@ app.use(session({ secret: 'prashant', saveUninitialized: true, resave: true, coo
 var urlString = 'http://crypto-testnets.sofodev.co:8000';
 var server = new StellarSdk.Server(urlString, { allowHttp: true });
 
-
+app.get('/issueAsset', function (req, res) {
+    var okToken = new StellarSdk.Asset(
+        assetName, issuerPublicKey);
+    console.log('asset issued');
+});
 
 module.exports = router;

@@ -19,4 +19,22 @@ app.use(session({ secret: 'prashant', saveUninitialized: true, resave: true, coo
 
 var urlString = 'http://crypto-testnets.sofodev.co:8000';
 var server = new StellarSdk.Server(urlString, { allowHttp: true });
+
+
+
+
+
+
+
+
+app.get('/loadAccount', async function (req, res) {
+    var loadAccount = await server.loadAccount('GDENPKUMUNAYWCRT7E6NFN5HBMNPIUISY7EJG4TVR3RHMS7FPQ2QJLZL');
+    console.log("hell", loadAccount);
+    res.send(loadAccount);
+
+});
+
+
+
+
 module.exports = router;

@@ -19,6 +19,12 @@ app.use(session({ secret: 'prashant', saveUninitialized: true, resave: true, coo
 var urlString = 'http://crypto-testnets.sofodev.co:8000';
 var server = new StellarSdk.Server(urlString, { allowHttp: true });
 
+
+var tokenSchema = require('../../db/tokenSave.js').collection;
+var transactionSchema = require('../../db/transactionSave.js').collection;
+var loadAccount1 = require('../../db/t-loadAccount.js').collection;
+
+
 var rootSeed = {// server
     publicKey: 'GBRPYHIL2CI3FNQ4BXLFMNDLFJUNPU2HY3ZMFSHONUCEOASW7QC7OX2H',
     secret: 'SDHOAMBNLGCE2MV5ZKIVZAQD3VCLGP53P3OBSBI6UN5L5XZI5TKHFQL4'
@@ -108,8 +114,11 @@ router.get('/balanceOf', function (req, res) {
 router.get('/loadAccount', async function (req, res) {
     try {
         keypair = StellarSdk.Keypair.fromSecret('SDHOAMBNLGCE2MV5ZKIVZAQD3VCLGP53P3OBSBI6UN5L5XZI5TKHFQL4')
+        
         var pubkey = keypair.publicKey();
         var loadAccount = await server.loadAccount(pubkey);
+        console.log(pubkey)
+
         console.log("load account", loadAccount);
         console.log('###############################');
         res.send(loadAccount);
@@ -180,8 +189,8 @@ router.get('/transferAsset', async function (req, res) {
 });
 
 
-app.get('/authorizationFlag', function (req, res) {
-    server.loadAccount(issuerPublicKey)
+router.get('/authorizationFlag', function (req, res) {
+    server.loadAccount(issuer.publicKey)
         .then(function (account) {
             StellarSdk.Network.useTestNetwork();
             var transaction = new StellarSdk.TransactionBuilder(account)
@@ -199,7 +208,7 @@ app.get('/authorizationFlag', function (req, res) {
 
 router.get('/changeTrust', function (req, res) {
     var issuingKeys = StellarSdk.Keypair
-        .fromSecret(issuerSecretKey);
+        .fromSecret(issuer.secretKey);
     var receivingKeys = StellarSdk.Keypair
         .fromSecret('SDSAVCRE5JRAI7UFAVLE5IMIZRD6N6WOJUWKY4GFN34LOBEEUS4W2T2D');
     // var receivingKeys = req.body.userSecretKey;
@@ -419,8 +428,9 @@ router.get('/recentTransactions', function (req, res) {
 router.get('/getDetailTxHashUsingHash', function (req, res) {
     try {
         // var hash = req.body.hash;
-        var hash = 'cfbd98664e3d3e22230c8a3c5b7ca163789dd0df7b31fc72ca812e050df30a9e';//manage offer
-        //d4fe007dff517b724c402bab959f83f4423b61d2729c973026bd7cf8ab0b54a5 payment hash
+       // var hash = 'cfbd98664e3d3e22230c8a3c5b7ca163789dd0df7b31fc72ca812e050df30a9e';//manage offer
+        var hash = 'd4fe007dff517b724c402bab959f83f4423b61d2729c973026bd7cf8ab0b54a5';//payment hash
+
         var url = urlString + '/transactions/' + hash + '/operations';
         // console.log(url);
 
@@ -477,7 +487,7 @@ app.get('/setHomeDomain', function (req, res) {
         });
 });
 
-
+//working
 router.get('/test', async function (req, res) {
     try {
         var sourceSecretKey = issuer.secret;// seed of acc from which tx process
@@ -486,7 +496,7 @@ router.get('/test', async function (req, res) {
         var receiverPublicKey = account2.publicKey;// public key of reciever acc
         StellarSdk.Network.useTestNetwork();
         // console.log('1');
-        //var server = new StellarSdk.Server('https://horizon-testnet.stellar.org');//live netwrk
+        var server = new StellarSdk.Server('https://horizon-testnet.stellar.org');//live netwrk
 
         //var server = new StellarSdk.Server('http://localhost:8000', { allowHttp: true });
         //console.log('2');
@@ -523,35 +533,35 @@ router.get('/test', async function (req, res) {
 
 
 
-app.get('/authacc', function (req, res) {// change trustline and make tx
-    try{
+router.get('/authacc', function (req, res) {// change trustline and make tx
+    try {
 
-    // var receivingKeys = StellarSdk.Keypair
-    //     .fromSecret(account3.secret);
-    console.log('0')
+        // var receivingKeys = StellarSdk.Keypair
+        //     .fromSecret(account3.secret);
+        console.log('0')
 
         var authaccount = account3.publicKey;
-     // var receivingKeys = req.body.userSecretKey;
-    server.loadAccount(issuingKeys.publicKey())
-        .then(function (receiver) {
-            console.log('1')
-            var transaction = new StellarSdk.TransactionBuilder(receiver)
-                // The `changeTrust` operation creates (or alters) a trustline
-                // The `limit` parameter below is optional
-                .addOperation(StellarSdk.Operation.allowTrust({
-                    assetCode: "okToken",
-                    trustor: authaccount,
-                    authorize:true
-                }))
-                .build();
-            transaction.sign(issuingKeys);
-            server.submitTransaction(transaction);
-            console.log('authacc');
-        })
-        
-        .catch(function (error) {
-            console.error('Error!', error);
-        });
+        // var receivingKeys = req.body.userSecretKey;
+        server.loadAccount(issuingKeys.publicKey())
+            .then(function (receiver) {
+                console.log('1')
+                var transaction = new StellarSdk.TransactionBuilder(receiver)
+                    // The `changeTrust` operation creates (or alters) a trustline
+                    // The `limit` parameter below is optional
+                    .addOperation(StellarSdk.Operation.allowTrust({
+                        assetCode: "okToken",
+                        trustor: authaccount,
+                        authorize: true
+                    }))
+                    .build();
+                transaction.sign(issuingKeys);
+                server.submitTransaction(transaction);
+                console.log('authacc');
+            })
+
+            .catch(function (error) {
+                console.error('Error!', error);
+            });
     }
     catch (e) {
         console.log("error occured")
@@ -562,7 +572,31 @@ app.get('/authacc', function (req, res) {// change trustline and make tx
 
 
 
+
+app.get('/bumpSequence', function (req, res) {// change trustline and make tx
+    try {
+        var bumpSequenceNo = '';
+        var authaccount = account3.publicKey;
+        server.loadAccount(issuingKeys.publicKey())
+            .then(function (receiver) {
+                var transaction = new StellarSdk.TransactionBuilder(receiver)
+                    .addOperation(StellarSdk.Operation.bumpSequence({
+                        bumpTo: bumpSequenceNo
+                    }))
+                    .build();
+                transaction.sign(issuingKeys);
+                server.submitTransaction(transaction);
+            })
+            .catch(function (error) {
+                console.error('Error!', error);
+            });
+    }
+    catch (e) {
+        console.log("error occured")
+    }
+});
 module.exports = router;
+
 
 
 ///home/prashant/prashant/stellar-core/src/transactions/readme.md

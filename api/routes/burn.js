@@ -24,6 +24,32 @@ var server = new StellarSdk.Server(urlString, { allowHttp: true });
 
 
 
+app.get('/burn', async function (req, res) {
+    var secretKey = req.body.secretKey;
+    var burn = onlyOwner(secretKey);
+    if (burn) {
+        var amount = req.body.amount;
+        var sourceSecretKey = req.body.sourceSecretKey;
+        var sourceKeypair = StellarSdk.Keypair.fromSecret(sourceSecretKey);
+        var sourcePublicKey = sourceKeypair.publicKey();
+        var receiverPublicKey = issuerPublicKey;
+        var server = new StellarSdk.Server('https://horizon-testnet.stellar.org');
+        StellarSdk.Network.useTestNetwork();
+        const account = await server.loadAccount(sourcePublicKey)
+        var transaction = new StellarSdk.TransactionBuilder(account)
+            .addOperation(StellarSdk.Operation.payment({
+                destination: receiverPublicKey,
+                asset: okToken,
+                amount: amount,
+            }))
+            .addMemo(StellarSdk.Memo.text('token burned(burning reference no.)'))
+            .build();
+        transaction.sign(sourceKeypair);
+        const temp = await server.submitTransaction(transaction)
+        console.log('submitted', temp._links);
+    }
+});
+
 
 
 module.exports = router;
